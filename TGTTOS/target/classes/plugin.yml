@@ -1,0 +1,12 @@
+name: TGTTOS
+version: 1.0
+main: top.TGTTOS.TGTTOS
+api-version: 1.21
+authors: youge
+description: 跑酷游戏
+
+commands:
+  tgttos:
+    description: 启动TGTTOS游戏
+    usage: /tgttos start
+    permission: tgttos.admin
