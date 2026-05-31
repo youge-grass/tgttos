@@ -10,50 +10,89 @@ import top.TGTTOS.room.RoomManager;
 import java.io.File;
 
 public class TGTTOS extends JavaPlugin {
-    private static TGTTOS main;
+    private static TGTTOS instance;
 
     public static TGTTOS getInstance() {
-        return main;
+        return instance;
     }
 
     @Override
     public void onEnable() {
-        main = this;
+        instance = this;
 
-        //创建配置文件夹
-        File data = getDataFolder();
-        if(!data.exists()) data.mkdirs();
-        File res = new File(data,"resource");
-        if(!res.exists()) res.mkdirs();
-        File dataYml = new File(res,"data.yml");
+        File dataFolder = getDataFolder();
+        if (!dataFolder.exists()) dataFolder.mkdirs();
 
-        //初始化配置
-        GameConfig.init(dataYml);
+        File resourceFolder = new File(dataFolder, "resource");
+        if (!resourceFolder.exists()) resourceFolder.mkdirs();
+
+        File dataFile = new File(resourceFolder, "data.yml");
+
+        GameConfig.init(dataFile);
         RoomManager.getInstance();
 
-        //注册监听器（统一传this）
-        getServer().getPluginManager().registerEvents(new GameListener(this),this);
-        getServer().getPluginManager().registerEvents(new PlayerListener(this),this);
+        getServer().getPluginManager().registerEvents(new GameListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
-        getLogger().info("TGTTOS加载完成");
+        getLogger().info("§aTGTTOS 插件已成功启动！");
     }
 
-    //【核心：重写父类onCommand，最简指令，删掉CommandListener，所有指令写这里】
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if(label.equalsIgnoreCase("tgttos")){
-            //在这里写/tgttos逻辑，原CommandListener代码全部挪进这里
-            if(args.length == 0){
-                sender.sendMessage("用法：/tgttos join/create");
+        if (label.equalsIgnoreCase("tgttos")) {
+            if (args.length == 0) {
+                sender.sendMessage("§c用法: /tgttos join | leave | set");
                 return true;
             }
-            //示例判断
-            if(args[0].equalsIgnoreCase("join")){
-                //进房间逻辑
-            }else if(args[0].equalsIgnoreCase("create")){
-                //创建房间逻辑
+
+            if (args[0].equalsIgnoreCase("join")) {
+                if (!(sender instanceof org.bukkit.entity.Player)) {
+                    sender.sendMessage("§c只有玩家能使用！");
+                    return true;
+                }
+                org.bukkit.entity.Player p = (org.bukkit.entity.Player) sender;
+                RoomManager.getInstance().getRoom(1).addPlayer(p);
+                return true;
             }
-            return true;
+
+            if (args[0].equalsIgnoreCase("leave")) {
+                if (!(sender instanceof org.bukkit.entity.Player)) {
+                    sender.sendMessage("§c只有玩家能使用！");
+                    return true;
+                }
+                org.bukkit.entity.Player p = (org.bukkit.entity.Player) sender;
+                for (top.TGTTOS.room.Room room : RoomManager.getInstance().getRooms()) {
+                    if (room.hasPlayer(p)) {
+                        room.removePlayer(p);
+                        sender.sendMessage("§a你已离开房间");
+                        return true;
+                    }
+                }
+                sender.sendMessage("§c你不在任何房间里");
+                return true;
+            }
+
+            if (args[0].equalsIgnoreCase("set")) {
+                if (args.length < 3) {
+                    sender.sendMessage("§c用法: /tgttos set <回合> <spawn1/spawn2/spawn3/finish>");
+                    return true;
+                }
+                if (!(sender instanceof org.bukkit.entity.Player)) return true;
+                org.bukkit.entity.Player p = (org.bukkit.entity.Player) sender;
+                try {
+                    int round = Integer.parseInt(args[1]);
+                    String type = args[2];
+                    boolean success = GameConfig.get().savePoint(round, type, p.getLocation());
+                    if (success) {
+                        p.sendMessage("§a成功保存点位！");
+                    } else {
+                        p.sendMessage("§c保存失败！");
+                    }
+                } catch (Exception e) {
+                    p.sendMessage("§c格式错误！");
+                }
+                return true;
+            }
         }
         return false;
     }
