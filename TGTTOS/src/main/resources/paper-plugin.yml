@@ -1,7 +1,0 @@
-name: TGTTOS
-version: 1.0
-main: top.TGTTOS.TGTTOS
-api-version: 1.21
-commands:
-  tgttos:
-    description: TGTTOS游戏主指令
