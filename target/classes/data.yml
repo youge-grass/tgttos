@@ -1,0 +1,35 @@
+# 大厅出生点
+lobby:
+  world: ""
+  x: 0.0
+  y: 0.0
+  z: 0.0
+
+# 游戏队列配置
+game:
+  min-player: 2
+  max-player: 16
+  count-second: 10
+
+# 标题文字
+title:
+  wait: "TGTTOS 等待中...人数[%now%/%max%]"
+  count: "TGTTOS 即将开始...倒计时:%time%秒"
+
+# 游戏出生点（3个）
+spawns:
+  spawn1:
+    world: ""
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  spawn2:
+    world: ""
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  spawn3:
+    world: ""
+    x: 0.0
+    y: 0.0
+    z: 0.0
